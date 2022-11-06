@@ -112,8 +112,6 @@ class Client
             $sender_client->montant -= $montant;
             $receveur_client->montant += $montant;
 
-            print_r($comptes);
-
             foreach ($comptes as $key => $compte) {
               $decoded_compte = json_decode($compte);
 
@@ -124,7 +122,6 @@ class Client
               if ($decoded_compte->id === $receveur_client->id) {
                 $comptes[$key] = json_encode($receveur_client);
               }
-              // echo $decoded_compte->id === $sender_client->id;
             }
 
             foreach ($comptes as $compte) {
@@ -134,9 +131,9 @@ class Client
 
             fwrite($operations, json_encode($field) . PHP_EOL);
 
-            $comptes = file('comptes.txt');
-
-            print_r($comptes);
+            fclose($comptes);
+            fclose($operations);
+            
             return "Virement effectué!";
           }
         }

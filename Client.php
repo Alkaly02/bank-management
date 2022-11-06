@@ -102,8 +102,6 @@ class Client
           $receveur_client = json_decode($compte);
           if ($receveur_client->numero === $receveur_numero_compte) {
 
-            // echo "sender balance: $sender_balance <br> receiver balance: $receveur_client->montant".PHP_EOL;
-
             // ! let's check if the sender balance is > to $montant
             if (($sender_balance - $montant) <= 0) {
               throw new Exception("Operation échouée, vous n'avez pas assez d'argent sur votre compte!");

@@ -75,9 +75,75 @@ class Client
     return $montant;
   }
 
-  public function virement($montant, $numero_compte): int
+  public static function virement($montant, $envoyeur_numero_compte, $receveur_numero_compte): string
   {
-    return $montant;
+    $operations = fopen("operations.txt", "a+") or die("Impossible d'ouvrir ce fichier");
+    $comptes = file('comptes.txt');
+    $nouveau_compte = fopen('comptes.txt', 'w');
+    // $clients = file('clients.txt');
+
+    $field = [
+      'id' => round(0, 2598499000),
+      'from' => $envoyeur_numero_compte,
+      'to' => $receveur_numero_compte,
+      'date_virement' => date('Y-m-d'),
+      'heure_virement' => time(),
+      'type' => 'virement'
+    ];
+
+    // !checking if the envoyeur_numero_compte exist
+    foreach ($comptes as $compte) {
+      $sender_client = json_decode($compte);
+      if ($sender_client->numero === $envoyeur_numero_compte) {
+
+        $sender_balance = $sender_client->montant;
+        // !checking if the receveur_numero_compte exist
+        foreach ($comptes as $compte) {
+          $receveur_client = json_decode($compte);
+          if ($receveur_client->numero === $receveur_numero_compte) {
+
+            // echo "sender balance: $sender_balance <br> receiver balance: $receveur_client->montant".PHP_EOL;
+
+            // ! let's check if the sender balance is > to $montant
+            if (($sender_balance - $montant) <= 0) {
+              throw new Exception("Operation échouée, vous n'avez pas assez d'argent sur votre compte!");
+            }
+
+            $sender_client->montant -= $montant;
+            $receveur_client->montant += $montant;
+
+            print_r($comptes);
+
+            foreach ($comptes as $key => $compte) {
+              $decoded_compte = json_decode($compte);
+
+              if ($decoded_compte->id === $sender_client->id) {
+                $comptes[$key] = json_encode($sender_client);
+              }
+
+              if ($decoded_compte->id === $receveur_client->id) {
+                $comptes[$key] = json_encode($receveur_client);
+              }
+              // echo $decoded_compte->id === $sender_client->id;
+            }
+
+            foreach ($comptes as $compte) {
+              $encoded_field = $compte;
+              fwrite($nouveau_compte, $encoded_field . PHP_EOL);
+            }
+
+            fwrite($operations, json_encode($field) . PHP_EOL);
+
+            $comptes = file('comptes.txt');
+
+            print_r($comptes);
+            return "Virement effectué!";
+          }
+        }
+        throw new Exception("Ce compte receveur n'existe pas!");
+      }
+    }
+    throw new Exception("Cet utilisateur qui essai d'envoyer n'existe pas!");
   }
 
   public static function voir_solde($numero_compte): string
@@ -87,7 +153,7 @@ class Client
     foreach ($comptes as $compte) {
       $decoded_compte = json_decode($compte);
       if ($decoded_compte->numero === $numero_compte) {
-        return "Votre solde est de: ".$decoded_compte->montant.PHP_EOL;
+        return "Votre solde est de: " . $decoded_compte->montant . PHP_EOL;
       }
     }
 
@@ -99,14 +165,15 @@ class Client
   }
 }
 
-// $client_1 = new Client("Alkaly", "DIALLO", 758966569, 'mab@gmail.com', 'Colobane');
+// $client_1 = new Client("Moussa", "BADJI", 758966569, 'mab@gmail.com', 'Colobane');
 // $client_1->creer_client();
 // print_r($client_1->faire_depot(100000000000000, 8623744632));
 
 try {
-  // echo Client::faire_depot(25895890000, 6945104914);
+  // echo Client::faire_depot(2589, 8858375260);
   // echo Client::faire_retrait(999990000, 6874317391);
-  echo Client::voir_solde(6945104914);
+  // echo Client::voir_solde(6945104914);
+  echo Client::virement(5000, 7185192164, 8858375260);
 } catch (Exception $e) {
-  $e->getMessage();
+  echo $e->getMessage();
 }

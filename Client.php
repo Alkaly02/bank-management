@@ -80,15 +80,14 @@ class Client
     return $montant;
   }
 
-  public function voir_solde($numero_compte): float
+  public static function voir_solde($numero_compte): string
   {
     $comptes = file('comptes.txt');
-    $nouveau_compte = fopen('comptes.txt', 'w');
 
     foreach ($comptes as $compte) {
       $decoded_compte = json_decode($compte);
       if ($decoded_compte->numero === $numero_compte) {
-        return $decoded_compte->montant;
+        return "Votre solde est de: ".$decoded_compte->montant.PHP_EOL;
       }
     }
 
@@ -100,13 +99,14 @@ class Client
   }
 }
 
-// $client_1 = new Client("Moussa", "BADJI", 758966569, 'mab@gmail.com', 'fass');
+// $client_1 = new Client("Alkaly", "DIALLO", 758966569, 'mab@gmail.com', 'Colobane');
 // $client_1->creer_client();
 // print_r($client_1->faire_depot(100000000000000, 8623744632));
 
 try {
-  // echo Client::faire_depot(2589800000, 6874317391);
-  echo Client::faire_retrait(999990000, 6874317391);
+  // echo Client::faire_depot(25895890000, 6945104914);
+  // echo Client::faire_retrait(999990000, 6874317391);
+  echo Client::voir_solde(6945104914);
 } catch (Exception $e) {
   $e->getMessage();
 }

@@ -82,8 +82,17 @@ class Client
 
   public function voir_solde($numero_compte): float
   {
+    $comptes = file('comptes.txt');
+    $nouveau_compte = fopen('comptes.txt', 'w');
 
-    return 2;
+    foreach ($comptes as $compte) {
+      $decoded_compte = json_decode($compte);
+      if ($decoded_compte->numero === $numero_compte) {
+        return $decoded_compte->montant;
+      }
+    }
+
+    return "Compte introuvable!";
   }
 
   public function details_compte($numero_compte)

@@ -129,7 +129,7 @@ class Client
 
             fwrite($operations, json_encode($field) . PHP_EOL);
 
-            fclose($comptes);
+            //fclose($comptes);
             fclose($operations);
             
             return "Virement effectué!";
